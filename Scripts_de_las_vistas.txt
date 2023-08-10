@@ -1,0 +1,44 @@
+1. Insertar en tablas los datos de CLIENTES, GENERO, PRODUCTOS y MONEDA. La base de datos a utilizar el que conocen, ORACLE, POSTGRES, SQL SERVER, etc.
+	Los datos los exporte directamente a sql server con el "Asistente de exportacion de datos"
+2. Crear una vista de clientes
+	A) Mostrar todas las columnas de la tabla clientes.
+			create view v_clientes
+			as
+			select *from clientes$;
+	B) Agregar una columna con la descripción del género. Ejemplo F: FEMENINO
+		create view v_Genero_del_cliente
+		as
+		select CODIGO_CLIENTE, NOMBRE_CLIENTE, TIPO_PERSONA,  FECHA_NACIMIENTO, LOCALIDAD,FECHA_ALTA_CLIENTE, GENERO  as 'CODIGO GENERO', case
+				when GENERO like 'F' then 'Femenino'
+				when GENERO like 'M' then 'Masculino'
+				else 'Juridico'
+		end as 'Descripcion del Genero'
+		from clientes$;
+
+		
+	C) Agregar la edad del cliente en base a la fecha de nacimiento, columna FECHA_NACIMIENTO.
+		create view v_clientes_Edades
+		as
+		select NOMBRE_CLIENTE, TIPO_PERSONA, FECHA_NACIMIENTO, DATEDIFF(YEAR, FECHA_NACIMIENTO, GETDATE()) as 'EDAD' 
+		from clientes$;
+		create view v_clientes_Edades2
+		as
+		select NOMBRE_CLIENTE, FECHA_NACIMIENTO, YEAR(GETDATE())-YEAR(FECHA_NACIMIENTO) as EDAD  
+		from clientes$;
+3. Crear una vista de saldos_productos
+  	A) Mostrar todas las columnas de la tabla productos
+		create view v_productos
+		as
+		select *from productos$;
+  	B) Calcular el saldo total del producto. SALDO_CAPITAL + SALDO_INTERES
+		create view v_saldo_total_productos
+		as
+		select OPERACION, TIPO_CARTERA, SALDO_CAPITAL+SALDO_INTERES as 'Saldo total de productos'  
+		from productos$;
+	C) Agregar la cotización y la descripción de la moneda que se encuentra en la tabla MONEDA.
+		create view v_productos_cotizacion
+		as
+		select p.*, m.COTIZACION, m.DESCRIPCION 
+		from productos$ as p 
+		inner join moneda$ as m 
+		on p.MONEDA=m.COD_MONEDA
